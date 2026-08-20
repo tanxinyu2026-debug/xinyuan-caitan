@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>鑫源菜摊 · 蔬菜配送</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --green:#07c160; --green-d:#06ad56; --orange:#ff9800; --red:#fa5151;
+  --bg:#f5f6f7; --card:#fff; --text:#1a1a1a; --sub:#8a8f99; --line:#eee;
+  --radius:14px;
+}
+html,body{height:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",Arial,sans-serif;background:#dfe3e6;color:var(--text);font-size:14px}
+button{font-family:inherit;border:none;background:none;cursor:pointer}
+.phone{max-width:480px;margin:0 auto;height:100%;background:var(--bg);display:flex;flex-direction:column;position:relative;overflow:hidden;box-shadow:0 0 30px rgba(0,0,0,.15)}
+#header{flex:none;z-index:10}
+#content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+#tabbar{flex:none;background:#fff;border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom)}
+
+/* ---------- header ---------- */
+.h-search{background:#fff;padding:10px 12px;display:flex;align-items:center;gap:10px}
+.h-search .fake{flex:1;background:#f2f3f5;border-radius:18px;height:34px;display:flex;align-items:center;justify-content:center;gap:6px;color:var(--sub);font-size:13px}
+.h-title{background:#fff;padding:10px 12px;display:flex;align-items:center;position:relative;border-bottom:1px solid var(--line)}
+.h-title .t{flex:1;text-align:center;font-size:16px;font-weight:600}
+.h-title .back{width:60px;text-align:left;font-size:22px;color:var(--text)}
+.h-title .right{width:60px;text-align:right;font-size:14px;color:var(--green)}
+
+/* ---------- tabbar ---------- */
+.tab{flex:1;padding:6px 0 4px;text-align:center;color:#9aa0a8;font-size:10px;user-select:none}
+.tab .ico{font-size:22px;display:block;position:relative;line-height:1.3}
+.tab.active{color:var(--green)}
+.badge{position:absolute;top:-4px;right:-12px;min-width:16px;height:16px;padding:0 4px;background:var(--red);color:#fff;font-size:10px;line-height:16px;border-radius:8px;font-style:normal}
+
+/* ---------- common ---------- */
+.card{background:var(--card);border-radius:var(--radius);box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.sec-title{display:flex;justify-content:space-between;align-items:baseline;padding:14px 14px 8px}
+.sec-title .name{font-size:16px;font-weight:700}
+.sec-title .more{font-size:12px;color:var(--sub)}
+.price{color:var(--red);font-weight:700}
+.price .cur{font-size:12px;margin-right:1px}
+.price .num{font-size:18px}
+.price .unit{font-size:12px;font-weight:400;color:var(--sub);margin-left:2px}
+
+/* ---------- home ---------- */
+.banner{height:132px;margin:12px 12px 0;border-radius:var(--radius);position:relative;overflow:hidden}
+.banner .slides{display:flex;height:100%;transition:transform .45s ease}
+.banner .slide{flex:none;width:100%;height:100%;display:flex;align-items:center;justify-content:center;gap:14px;color:#fff;font-weight:700}
+.banner .slide .big{font-size:44px}
+.banner .slide .txt{font-size:16px;line-height:1.5;text-shadow:0 1px 3px rgba(0,0,0,.15)}
+.banner .slide .sub{display:block;font-size:12px;font-weight:400;opacity:.9;margin-top:4px}
+.banner .dots{position:absolute;bottom:8px;left:0;right:0;display:flex;justify-content:center;gap:5px}
+.banner .dots i{width:6px;height:6px;border-radius:3px;background:rgba(255,255,255,.5);display:block}
+.banner .dots i.on{background:#fff;width:14px}
+.s1{background:linear-gradient(120deg,#2bb673,#07c160)}
+.s2{background:linear-gradient(120deg,#ff9a3c,#ff6a3c)}
+.s3{background:linear-gradient(120deg,#5c7cfa,#845ef7)}
+.cat-row{display:flex;margin:12px;padding:14px 0 10px}
+.cat-item{flex:1;text-align:center;user-select:none}
+.cat-item .ci{width:46px;height:46px;margin:0 auto 6px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;background:#f0f9f2}
+.cat-item .cn{font-size:12px;color:#333}
+.seckill{margin:0 12px;border-radius:var(--radius);overflow:hidden}
+.seckill .sk-head{background:linear-gradient(120deg,#ff5f3c,#ff8f3c);color:#fff;padding:10px 14px;display:flex;align-items:center;gap:10px}
+.seckill .sk-head .st{font-weight:700;font-size:15px}
+.seckill .sk-head .cd{font-size:12px;display:flex;align-items:center;gap:4px}
+.seckill .sk-head .cd b{background:rgba(0,0,0,.25);border-radius:4px;padding:1px 5px;font-size:12px;font-family:monospace}
+.seckill .sk-body{background:#fff;display:flex;overflow-x:auto;gap:0;padding:10px 0}
+.seckill .sk-item{flex:none;width:90px;text-align:center;border-right:1px solid var(--line)}
+.seckill .sk-item .e{font-size:34px;display:block;line-height:1.3}
+.seckill .sk-item .n{font-size:12px;color:#333;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding:0 4px}
+.seckill .sk-item .p{font-size:14px;color:var(--red);font-weight:700}
+.seckill .sk-item .o{font-size:11px;color:#bbb;text-decoration:line-through}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 12px 16px}
+.p-card{background:#fff;border-radius:var(--radius);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04);position:relative;cursor:pointer}
+.p-card .emoji{height:104px;display:flex;align-items:center;justify-content:center;font-size:52px;background:linear-gradient(135deg,#f8fdf9,#edf8ef)}
+.p-card .tag{position:absolute;top:8px;left:8px;font-size:10px;color:#fff;background:var(--red);border-radius:4px;padding:1px 5px}
+.p-card .tag.orange{background:var(--orange)}
+.p-card .tag.green{background:var(--green)}
+.p-card .info{padding:8px 10px 10px}
+.p-card .nm{font-size:13px;font-weight:600;line-height:1.35;height:36px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.p-card .meta{font-size:11px;color:var(--sub);margin:3px 0 6px}
+.p-card .row{display:flex;align-items:center;justify-content:space-between}
+.p-card .add{width:26px;height:26px;border-radius:50%;background:var(--green);color:#fff;font-size:18px;line-height:26px;text-align:center;font-weight:700}
+.p-card .add:active{transform:scale(.9)}
+
+/* ---------- category ---------- */
+.cat-layout{display:flex;height:100%}
+.cat-side{width:92px;flex:none;background:#f0f1f3;overflow-y:auto}
+.cat-side .cs{padding:16px 8px;font-size:13px;color:#555;text-align:center;position:relative}
+.cat-side .cs.on{background:#fff;color:var(--green);font-weight:700}
+.cat-side .cs.on::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:18px;background:var(--green);border-radius:2px}
+.cat-main{flex:1;overflow-y:auto;background:#fff;padding:10px}
+.cat-main .cm-title{font-size:14px;font-weight:700;margin:2px 0 10px;display:flex;align-items:center;gap:6px}
+.clist{display:flex;flex-direction:column;gap:12px}
+.citem{display:flex;gap:10px;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.citem .e{width:72px;height:72px;flex:none;border-radius:10px;background:#f5f9f6;display:flex;align-items:center;justify-content:center;font-size:38px}
+.citem .mid{flex:1;min-width:0}
+.citem .mid .n{font-size:14px;font-weight:600}
+.citem .mid .m{font-size:11px;color:var(--sub);margin-top:3px}
+.citem .stepper{display:flex;align-items:center;gap:8px;margin-top:6px}
+.stepper button{width:22px;height:22px;border-radius:50%;background:#f2f3f5;color:#333;font-size:14px;line-height:22px}
+.stepper button.add{background:var(--green);color:#fff}
+.stepper .q{font-size:14px;min-width:20px;text-align:center;font-weight:600}
+
+/* ---------- cart ---------- */
+.cart-empty{padding:90px 0;text-align:center;color:var(--sub)}
+.cart-empty .e{font-size:64px;display:block;margin-bottom:14px}
+.cart-empty .btn{display:inline-block;margin-top:18px;padding:8px 26px;border-radius:20px;background:var(--green);color:#fff;font-size:14px}
+.cart-list{padding:12px}
+.cart-row{display:flex;align-items:center;gap:10px;padding:10px;margin-bottom:10px}
+.cart-row .e{width:58px;height:58px;flex:none;border-radius:10px;background:#f5f9f6;display:flex;align-items:center;justify-content:center;font-size:32px}
+.cart-row .mid{flex:1;min-width:0}
+.cart-row .mid .n{font-size:14px;font-weight:600}
+.cart-row .mid .p{font-size:16px;color:var(--red);font-weight:700;margin-top:4px}
+.cart-foot{position:sticky;bottom:0;background:#fff;padding:10px 14px calc(10px + env(safe-area-inset-bottom));display:flex;align-items:center;gap:12px;box-shadow:0 -2px 8px rgba(0,0,0,.04)}
+.cart-foot .sum{flex:1}
+.cart-foot .sum .t1{font-size:11px;color:var(--sub)}
+.cart-foot .sum .t2{font-size:18px;color:var(--red);font-weight:700}
+.cart-foot .pay{background:linear-gradient(90deg,#07c160,#05a653);color:#fff;padding:10px 26px;border-radius:22px;font-size:15px;font-weight:600}
+.cart-foot .pay:active{opacity:.85}
+
+/* ---------- mine ---------- */
+.mine{padding:12px}
+.profile{background:linear-gradient(120deg,#07c160,#05a653);border-radius:var(--radius);color:#fff;padding:20px 16px;display:flex;align-items:center;gap:14px}
+.profile .av{width:58px;height:58px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:30px}
+.profile .nm{font-size:18px;font-weight:700}
+.profile .sub{font-size:12px;opacity:.85;margin-top:4px}
+.ord-card{margin-top:12px;padding:6px 0 10px}
+.ord-card .oc-head{display:flex;justify-content:space-between;align-items:center;padding:12px 14px 8px;font-weight:600}
+.ord-card .oc-head .all{font-size:12px;color:var(--sub);font-weight:400}
+.oc-row{display:flex;padding:8px 0}
+.oc-item{flex:1;text-align:center;color:#444;position:relative}
+.oc-item .i{font-size:24px;display:block;position:relative}
+.oc-item .n{font-size:11px;margin-top:4px}
+.oc-item .cnt{position:absolute;top:-4px;left:calc(50% + 6px);background:var(--red);color:#fff;border-radius:8px;font-size:10px;min-width:15px;height:15px;line-height:15px;padding:0 4px}
+.menu{margin-top:12px;padding:4px 0}
+.mrow{display:flex;align-items:center;padding:13px 14px;border-bottom:1px solid var(--line)}
+.mrow:last-child{border-bottom:none}
+.mrow .i{font-size:20px;margin-right:10px}
+.mrow .n{flex:1;font-size:14px}
+.mrow .ar{color:#c9cdd4;font-size:14px}
+.recent{margin-top:12px;padding:12px 14px}
+.recent .rt{font-weight:700;margin-bottom:10px}
+.o-card{background:#fafbfc;border-radius:10px;padding:10px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.o-card .e{font-size:28px}
+.o-card .info{flex:1;min-width:0}
+.o-card .info .t{font-size:13px;font-weight:600}
+.o-card .info .d{font-size:11px;color:var(--sub);margin-top:2px}
+.o-card .st{font-size:12px;color:var(--green)}
+
+/* ---------- product detail ---------- */
+.detail{background:#fff;min-height:100%}
+.detail .hero{height:230px;display:flex;align-items:center;justify-content:center;font-size:110px;background:linear-gradient(135deg,#f8fdf9,#eaf6ee)}
+.detail .body{padding:14px}
+.detail .nm{font-size:19px;font-weight:700}
+.detail .meta{font-size:12px;color:var(--sub);margin:6px 0 10px}
+.detail .price{font-size:24px}
+.detail .price .unit{font-size:13px}
+.detail .desc{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.detail .desc .dt{font-weight:700;margin-bottom:8px}
+.detail .desc p{font-size:13px;color:#555;line-height:1.7}
+.detail .buybar{position:sticky;bottom:0;background:#fff;display:flex;align-items:center;padding:10px 14px calc(10px + env(safe-area-inset-bottom));gap:12px;box-shadow:0 -2px 8px rgba(0,0,0,.05)}
+.detail .buybar .stp{display:flex;align-items:center;gap:10px}
+.detail .buybar .stp button{width:30px;height:30px;border-radius:50%;background:#f2f3f5;font-size:18px;line-height:30px}
+.detail .buybar .stp button.add{background:var(--green);color:#fff}
+.detail .buybar .stp .q{font-size:16px;min-width:24px;text-align:center;font-weight:700}
+.detail .buybar .btns{flex:1;display:flex;gap:10px}
+.detail .buybar .cart-btn,.detail .buybar .buy-btn{flex:1;text-align:center;padding:11px 0;border-radius:22px;font-size:15px;font-weight:600}
+.detail .buybar .cart-btn{background:#fdecec;color:var(--red)}
+.detail .buybar .buy-btn{background:linear-gradient(90deg,#ff9a3c,#ff6a3c);color:#fff}
+
+/* ---------- search ---------- */
+.search-bar{background:#fff;padding:10px 12px;display:flex;gap:10px;align-items:center}
+.search-bar input{flex:1;height:34px;border:none;outline:none;background:#f2f3f5;border-radius:17px;padding:0 16px;font-size:14px}
+.search-bar .cancel{font-size:14px;color:var(--green)}
+.hot{padding:14px}
+.hot .ht{font-size:13px;color:var(--sub);margin-bottom:10px}
+.hot .hs{display:flex;flex-wrap:wrap;gap:8px}
+.hot .hs span{background:#fff;padding:6px 14px;border-radius:16px;font-size:13px;border:1px solid var(--line)}
+.sresults{padding:4px 12px 16px}
+.sresults .sr{display:flex;align-items:center;gap:10px;background:#fff;border-radius:12px;padding:10px;margin-bottom:8px;cursor:pointer}
+.sresults .sr .e{width:52px;height:52px;border-radius:8px;background:#f5f9f6;display:flex;align-items:center;justify-content:center;font-size:30px}
+.sresults .sr .mid{flex:1;min-width:0}
+.sresults .sr .mid .n{font-size:14px;font-weight:600}
+.sresults .sr .mid .m{font-size:11px;color:var(--sub);margin-top:3px}
+.sresults .sr .p{font-size:16px;color:var(--red);font-weight:700}
+.sresults .sr .add{width:26px;height:26px;border-radius:50%;background:var(--green);color:#fff;font-size:18px;line-height:26px;text-align:center}
+
+/* ---------- checkout ---------- */
+.ck{padding:12px}
+.ck-addr{background:#fff;border-radius:var(--radius);padding:14px;display:flex;align-items:center;gap:10px;cursor:pointer}
+.ck-addr .tag{flex:none;background:#e8f7ee;color:var(--green);font-size:11px;padding:2px 6px;border-radius:4px}
+.ck-addr .who{font-size:15px;font-weight:700}
+.ck-addr .phone{color:var(--sub);font-size:13px;margin-left:8px}
+.ck-addr .ad{font-size:13px;color:#555;margin-top:4px}
+.ck-addr .ar{margin-left:auto;color:#c9cdd4;font-size:16px}
+.ck-box{margin-top:12px;background:#fff;border-radius:var(--radius);padding:4px 14px}
+.ck-row{display:flex;align-items:center;padding:13px 0;border-bottom:1px solid var(--line);font-size:14px}
+.ck-row:last-child{border-bottom:none}
+.ck-row .lb{color:#555;width:76px;flex:none}
+.ck-row .vl{flex:1;text-align:right;color:#333}
+.ck-row .vl.sel{color:var(--green)}
+.ck-goods{margin-top:12px;background:#fff;border-radius:var(--radius);padding:4px 14px}
+.ck-g .ck-row .vl{display:flex;justify-content:flex-end;gap:14px}
+.ck-sum{position:sticky;bottom:0;background:#fff;margin-top:12px;border-radius:var(--radius) var(--radius) 0 0;padding:12px 14px calc(12px + env(safe-area-inset-bottom))}
+.ck-sum .line{display:flex;justify-content:space-between;font-size:13px;color:#555;padding:3px 0}
+.ck-sum .line.big{font-size:15px;color:var(--text);font-weight:700}
+.ck-sum .line.big .v{color:var(--red);font-size:20px}
+.ck-sum .submit{margin-top:12px;background:linear-gradient(90deg,#07c160,#05a653);color:#fff;text-align:center;padding:13px 0;border-radius:24px;font-size:16px;font-weight:700}
+.ck-sum .submit:active{opacity:.85}
+.addr-pick{background:#fff;margin-top:12px;border-radius:var(--radius)}
+.addr-pick .ap{padding:14px;border-bottom:1px solid var(--line);display:flex;gap:10px;align-items:flex-start}
+.addr-pick .ap:last-child{border-bottom:none}
+.addr-pick .ap .dot{width:18px;height:18px;border-radius:50%;border:2px solid #d5d9df;margin-top:2px;flex:none;display:flex;align-items:center;justify-content:center}
+.addr-pick .ap.sel .dot{border-color:var(--green)}
+.addr-pick .ap.sel .dot::after{content:'';width:10px;height:10px;border-radius:50%;background:var(--green)}
+
+/* ---------- success ---------- */
+.ok{padding:70px 24px 30px;text-align:center}
+.ok .ring{width:92px;height:92px;margin:0 auto 20px;border-radius:50%;background:linear-gradient(135deg,#2fd66e,#07c160);display:flex;align-items:center;justify-content:center;animation:pop .45s cubic-bezier(.34,1.56,.64,1)}
+.ok .ring span{color:#fff;font-size:46px}
+@keyframes pop{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+.ok .t1{font-size:19px;font-weight:700}
+.ok .t2{font-size:13px;color:var(--sub);margin-top:8px;line-height:1.7}
+.ok .card2{background:#fff;border-radius:var(--radius);padding:16px;margin-top:26px;text-align:left}
+.ok .card2 .r{display:flex;justify-content:space-between;font-size:14px;padding:7px 0}
+.ok .card2 .r .k{color:#555}
+.ok .btn-ok{display:block;margin-top:26px;background:linear-gradient(90deg,#07c160,#05a653);color:#fff;text-align:center;padding:13px 0;border-radius:24px;font-size:16px;font-weight:700}
+.ok .btn-ok.gray{background:#fff;color:#333;border:1px solid #e5e7eb;margin-top:12px}
+
+/* ---------- toast ---------- */
+#toast{position:fixed;top:18%;left:50%;transform:translateX(-50%) translateY(-8px);background:rgba(0,0,0,.78);color:#fff;padding:10px 22px;border-radius:20px;font-size:14px;opacity:0;pointer-events:none;transition:all .25s;z-index:999;max-width:80vw;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div id="header"></div>
+  <div id="content"></div>
+  <nav id="tabbar"></nav>
+</div>
+<div id="toast"></div>
+
+<script>
+/* ================= 数据 ================= */
+var CATS = [
+  {id:'ye',   name:'叶菜类', icon:'🥬'},
+  {id:'gen',  name:'根茎类', icon:'🥔'},
+  {id:'qie',  name:'茄果类', icon:'🍅'},
+  {id:'gua',  name:'瓜类',   icon:'🥒'},
+  {id:'jun',  name:'菌菇类', icon:'🍄'},
+  {id:'cong', name:'葱蒜类', icon:'🧅'}
+];
+
+var PRODUCTS = [
+  {id:'v1',  cat:'ye',   name:'上海青',          emoji:'🥬', price:2.50,  unit:'/斤', sales:'1.5万', rating:4.8, tag:'热卖'},
+  {id:'v2',  cat:'ye',   name:'生菜',            emoji:'🥗', price:3.20,  unit:'/斤', sales:'8200',  rating:4.7},
+  {id:'v3',  cat:'ye',   name:'油麦菜',          emoji:'🥬', price:3.00,  unit:'/斤', sales:'6900',  rating:4.6},
+  {id:'v4',  cat:'ye',   name:'菠菜',            emoji:'🥬', price:4.50,  unit:'/斤', sales:'5600',  rating:4.8},
+  {id:'v5',  cat:'ye',   name:'大白菜',          emoji:'🥬', price:1.50,  unit:'/斤', sales:'2.8万', rating:4.9, tag:'特价'},
+  {id:'v6',  cat:'ye',   name:'娃娃菜',          emoji:'🥬', price:3.50,  unit:'/斤', sales:'4300',  rating:4.7},
+  {id:'v7',  cat:'ye',   name:'韭菜',            emoji:'🌿', price:3.80,  unit:'/斤', sales:'5100',  rating:4.6},
+  {id:'v8',  cat:'ye',   name:'香菜',            emoji:'🌿', price:6.80,  unit:'/斤', sales:'3900',  rating:4.7},
+  {id:'v9',  cat:'gen',  name:'土豆',            emoji:'🥔', price:2.99,  unit:'/斤', sales:'2.1万', rating:4.7, tag:'热卖'},
+  {id:'v10', cat:'gen',  name:'胡萝卜',          emoji:'🥕', price:3.50,  unit:'/斤', sales:'7200',  rating:4.6},
+  {id:'v11', cat:'gen',  name:'白萝卜',          emoji:'🥬', price:1.80,  unit:'/斤', sales:'9100',  rating:4.8, tag:'特价'},
+  {id:'v12', cat:'gen',  name:'红薯',            emoji:'🍠', price:3.20,  unit:'/斤', sales:'6400',  rating:4.7},
+  {id:'v13', cat:'gen',  name:'山药',            emoji:'🥖', price:6.50,  unit:'/斤', sales:'2800',  rating:4.8},
+  {id:'v14', cat:'gen',  name:'莲藕',            emoji:'🥬', price:5.90,  unit:'/斤', sales:'3300',  rating:4.6},
+  {id:'v15', cat:'qie',  name:'西红柿',          emoji:'🍅', price:3.99,  unit:'/斤', sales:'1.2万', rating:4.8, tag:'热卖'},
+  {id:'v16', cat:'qie',  name:'茄子',            emoji:'🍆', price:3.80,  unit:'/斤', sales:'6100',  rating:4.7},
+  {id:'v17', cat:'qie',  name:'青椒',            emoji:'🫑', price:4.20,  unit:'/斤', sales:'5800',  rating:4.6},
+  {id:'v18', cat:'qie',  name:'彩椒',            emoji:'🫑', price:7.80,  unit:'/斤', sales:'1600',  rating:4.8},
+  {id:'v19', cat:'qie',  name:'小米辣',          emoji:'🌶️', price:8.90,  unit:'/斤', sales:'3400',  rating:4.7},
+  {id:'v20', cat:'gua',  name:'黄瓜',            emoji:'🥒', price:4.50,  unit:'/斤', sales:'1.1万', rating:4.7, tag:'热卖'},
+  {id:'v21', cat:'gua',  name:'丝瓜',            emoji:'🥒', price:5.50,  unit:'/斤', sales:'3100',  rating:4.6},
+  {id:'v22', cat:'gua',  name:'苦瓜',            emoji:'🥒', price:4.80,  unit:'/斤', sales:'2400',  rating:4.5},
+  {id:'v23', cat:'gua',  name:'冬瓜',            emoji:'🍈', price:1.60,  unit:'/斤', sales:'7200',  rating:4.8, tag:'特价'},
+  {id:'v24', cat:'gua',  name:'南瓜',            emoji:'🎃', price:3.20,  unit:'/斤', sales:'4600',  rating:4.7},
+  {id:'v25', cat:'gua',  name:'西葫芦',          emoji:'🥒', price:3.90,  unit:'/斤', sales:'2900',  rating:4.6},
+  {id:'v26', cat:'jun',  name:'香菇',            emoji:'🍄', price:9.90,  unit:'/斤', sales:'5200',  rating:4.8, tag:'热卖'},
+  {id:'v27', cat:'jun',  name:'金针菇',          emoji:'🍄', price:4.50,  unit:'/斤', sales:'4800',  rating:4.6},
+  {id:'v28', cat:'jun',  name:'杏鲍菇',          emoji:'🍄', price:6.90,  unit:'/斤', sales:'3700',  rating:4.7},
+  {id:'v29', cat:'jun',  name:'平菇',            emoji:'🍄', price:5.50,  unit:'/斤', sales:'2600',  rating:4.6},
+  {id:'v30', cat:'jun',  name:'干木耳',          emoji:'🍄', price:7.50,  unit:'/斤', sales:'1900',  rating:4.7},
+  {id:'v31', cat:'cong', name:'小葱',            emoji:'🌿', price:2.50,  unit:'/斤', sales:'9800',  rating:4.8, tag:'热卖'},
+  {id:'v32', cat:'cong', name:'大葱',            emoji:'🌿', price:2.80,  unit:'/斤', sales:'7600',  rating:4.6},
+  {id:'v33', cat:'cong', name:'洋葱',            emoji:'🧅', price:2.80,  unit:'/斤', sales:'6700',  rating:4.6},
+  {id:'v34', cat:'cong', name:'生姜',            emoji:'🌿', price:6.80,  unit:'/斤', sales:'4200',  rating:4.7},
+  {id:'v35', cat:'cong', name:'大蒜',            emoji:'🧄', price:7.90,  unit:'/斤', sales:'5600',  rating:4.8},
+  {id:'v36', cat:'cong', name:'蒜薹',            emoji:'🌿', price:6.50,  unit:'/斤', sales:'2100',  rating:4.6}
+];
+
+var HOT_IDS = ['v1','v9','v15','v20','v26','v31','v12','v33'];   // 首页热卖推荐
+var SELL_IDS = ['v1','v15','v20','v31'];                        // 限时秒杀
+var ADDRESSES = [
+  {name:'张女士', phone:'138****1234', addr:'幸福花园小区 3栋2单元502室', tag:'家'},
+  {name:'张女士', phone:'138****1234', addr:'阳光科技园 A座 1208室',     tag:'公司'}
+];
+var TIME_SLOTS = ['今天 17:00-19:00','明天 09:00-11:00','明天 14:00-16:00'];
+
+/* ================= 状态 ================= */
+var cart = loadCart();
+var orders = [];
+var view = {name:'tab', tab:'home'};
+var stack = [];
+var selectedAddr = 0;
+var selectedSlot = 0;
+var detailQty = 1;
+
+function loadCart(){
+  try{ return JSON.parse(localStorage.getItem('fresh_cart')) || {}; }catch(e){ return {}; }
+}
+function saveCart(){
+  try{ localStorage.setItem('fresh_cart', JSON.stringify(cart)); }catch(e){}
+}
+function product(id){ return PRODUCTS.find(function(p){ return p.id === id; }); }
+function cartCount(){ var n=0; for(var k in cart) n += cart[k]; return n; }
+function cartTotal(){ var t=0; for(var k in cart) t += product(k).price * cart[k]; return Math.round(t*100)/100; }
+function fmt(n){ return (Math.round(n*100)/100).toFixed(2); }
+function tagClass(t){
+  if(t==='特价') return 'orange';
+  if(t==='新品') return 'green';
+  return '';
+}
+
+/* ================= 导航 ================= */
+function go(v){ view = v; render(); window.scrollTo && document.getElementById('content').scrollTo(0,0); }
+function push(v){ stack.push(view); go(v); }
+function back(){ if(stack.length){ view = stack.pop(); render(); } }
+
+function render(){
+  var h = document.getElementById('header');
+  var c = document.getElementById('content');
+  var tb = document.getElementById('tabbar');
+  if(view.name === 'tab'){
+    tb.style.display = 'flex';
+    if(view.tab === 'home') h.innerHTML = '<div class="h-search"><div class="fake" onclick="push({name:\'page\',page:\'search\'})">🔍 搜索 蔬菜 / 水果 / 肉禽…</div><span style="font-size:20px" onclick="push({name:\'page\',page:\'cart\'})">🛒<span id="hbadge"></span></span></div>';
+    else if(view.tab === 'cat') h.innerHTML = '<div class="h-title"><div class="t">商品分类</div></div>';
+    else if(view.tab === 'cart') h.innerHTML = '<div class="h-title"><div class="t">购物车</div></div>';
+    else h.innerHTML = '<div class="h-title"><div class="t">我的</div></div>';
+    if(view.tab === 'home') renderHome(c); else if(view.tab === 'cat') renderCat(c); else if(view.tab === 'cart') renderCart(c); else renderMine(c);
+    renderTabbar(tb);
+  } else {
+    tb.style.display = 'none';
+    if(view.page === 'search') renderSearch(h,c);
+    else if(view.page === 'product') renderProduct(h,c);
+    else if(view.page === 'checkout') renderCheckout(h,c);
+    else if(view.page === 'addr') renderAddr(h,c);
+    else if(view.page === 'success') renderSuccess(h,c);
+  }
+  renderBadge();
+}
+
+function renderTabbar(tb){
+  var tabs = [
+    {k:'home', i:'🏠', n:'首页'},
+    {k:'cat',  i:'📂', n:'分类'},
+    {k:'cart', i:'🛒', n:'购物车'},
+    {k:'mine', i:'👤', n:'我的'}
+  ];
+  tb.innerHTML = tabs.map(function(t){
+    var badge = (t.k==='cart' && cartCount()>0) ? '<i class="badge">'+cartCount()+'</i>' : '';
+    return '<div class="tab'+(view.tab===t.k?' active':'')+'" onclick="go({name:\'tab\',tab:\''+t.k+'\'})"><span class="ico">'+t.i+badge+'</span>'+t.n+'</div>';
+  }).join('');
+}
+function renderBadge(){
+  var el = document.getElementById('hbadge');
+  if(el) el.innerHTML = cartCount()>0 ? '<i class="badge">'+cartCount()+'</i>' : '';
+}
+
+/* ================= 首页 ================= */
+var bannerIdx = 0;
+var bannerTimer = null;
+function renderHome(c){
+  var slides = [
+    {cls:'s1', icon:'🌱', t:'新人专享', s:'首单立减 10 元 · 全场包邮'},
+    {cls:'s2', icon:'🥬', t:'产地直采 · 新鲜到家', s:'当季蔬菜 5 折起'},
+    {cls:'s3', icon:'⏰', t:'限时秒杀', s:'每晚 20:00 准时开抢'}
+  ];
+  var sec = slides.map(function(s,i){
+    return '<div class="slide '+s.cls+'"><span class="big">'+s.icon+'</span><span class="txt">'+s.t+'<span class="sub">'+s.s+'</span></span></div>';
+  }).join('');
+  var dots = slides.map(function(_,i){ return '<i class="'+(i===bannerIdx?'on':'')+'"></i>'; }).join('');
+  var cats = CATS.map(function(cat){ return '<div class="cat-item" onclick="goToCat(\''+cat.id+'\')"><div class="ci">'+cat.icon+'</div><div class="cn">'+cat.name+'</div></div>'; }).join('');
+  var hot = HOT_IDS.map(function(id){ return pCard(product(id)); }).join('');
+  var sell = SELL_IDS.map(function(id){
+    var p = product(id);
+    return '<div class="sk-item" onclick="push({name:\'page\',page:\'product\',id:\''+p.id+'\'})"><span class="e">'+p.emoji+'</span><span class="n">'+p.name+'</span><span class="p">¥'+p.price.toFixed(1)+'</span><span class="o">¥'+Math.round(p.price*1.4)+'</span></div>';
+  }).join('');
+  c.innerHTML =
+    '<div class="banner"><div class="slides" id="slides" style="transform:translateX(-'+(bannerIdx*100)+'%)">'+sec+'</div><div class="dots">'+dots+'</div></div>' +
+    '<div class="card cat-row">'+cats+'</div>' +
+    '<div class="card seckill"><div class="sk-head"><span class="st">⚡ 限时秒杀</span><span class="cd">距结束 <b id="cdh">--</b>:<b id="cdm">--</b>:<b id="cds">--</b></span></div><div class="sk-body">'+sell+'</div></div>' +
+    '<div class="sec-title"><span class="name">🔥 热卖推荐</span><span class="more">当日达 · 坏果包赔 ›</span></div>' +
+    '<div class="grid">'+hot+'</div>';
+  startBanner();
+  startClock();
+}
+function startBanner(){
+  if(bannerTimer) clearInterval(bannerTimer);
+  bannerTimer = setInterval(function(){
+    bannerIdx = (bannerIdx+1) % 3;
+    var sl = document.getElementById('slides');
+    if(sl){ sl.style.transform = 'translateX(-'+(bannerIdx*100)+'%)'; }
+    var dots = sl && sl.parentNode.querySelectorAll('.dots i');
+    if(dots) for(var i=0;i<dots.length;i++) dots[i].className = (i===bannerIdx?'on':'');
+  }, 3500);
+}
+function startClock(){
+  function tick(){
+    var now = new Date();
+    var end = new Date(now); end.setHours(24,0,0,0);
+    var d = Math.max(0, end - now);
+    var h = Math.floor(d/3600000), m = Math.floor(d%3600000/60000), s = Math.floor(d%60000/1000);
+    function pad(x){ return x<10 ? '0'+x : ''+x; }
+    var a=document.getElementById('cdh'), b=document.getElementById('cdm'), c=document.getElementById('cds');
+    if(a){ a.textContent=pad(h); b.textContent=pad(m); c.textContent=pad(s); }
+  }
+  tick();
+  setInterval(tick, 1000);
+}
+function goToCat(id){
+  view = {name:'tab', tab:'cat', cat:id};
+  render();
+}
+
+/* ================= 商品卡片 ================= */
+function pCard(p){
+  var tag = p.tag ? '<span class="tag '+tagClass(p.tag)+'">'+p.tag+'</span>' : '';
+  return '<div class="p-card" onclick="push({name:\'page\',page:\'product\',id:\''+p.id+'\'})">'+tag+
+    '<div class="emoji">'+p.emoji+'</div>'+
+    '<div class="info"><div class="nm">'+p.name+'</div>'+
+    '<div class="meta">⭐ '+p.rating+' · 已售 '+p.sales+'</div>'+
+    '<div class="row"><span class="price"><span class="cur">¥</span><span class="num">'+p.price.toFixed(2)+'</span><span class="unit">'+p.unit+'</span></span>'+
+    '<button class="add" onclick="event.stopPropagation();addToCart(\''+p.id+'\',1)">+</button></div></div></div>';
+}
+function cItem(p, extra){
+  return '<div class="citem">'+(extra||'')+
+    '<div class="e" onclick="push({name:\'page\',page:\'product\',id:\''+p.id+'\'})">'+p.emoji+'</div>'+
+    '<div class="mid"><div class="n">'+p.name+'</div>'+
+    '<div class="m">⭐ '+p.rating+' · 已售 '+p.sales+'</div>'+
+    '<div class="stepper"><button onclick="changeQty(\''+p.id+'\',-1)">−</button><span class="q">'+(cart[p.id]||0)+'</span><button class="add" onclick="changeQty(\''+p.id+'\',1)">+</button></div></div>'+
+    '<span class="price"><span class="cur">¥</span><span class="num">'+p.price.toFixed(2)+'</span><span class="unit">'+p.unit+'</span></span></div>';
+}
+
+/* ================= 分类 ================= */
+function renderCat(c){
+  var cur = view.cat || 'veg';
+  var side = CATS.map(function(cat){
+    return '<div class="cs'+(cat.id===cur?' on':'')+'" onclick="view.cat=\''+cat.id+'\';render()">'+cat.name+'</div>';
+  }).join('');
+  var list = PRODUCTS.filter(function(p){ return p.cat===cur; }).map(function(p){ return cItem(p); }).join('');
+  var title = CATS.filter(function(cat){ return cat.id===cur; })[0];
+  c.innerHTML = '<div class="cat-layout"><div class="cat-side">'+side+'</div>'+
+    '<div class="cat-main"><div class="cm-title">'+title.icon+' '+title.name+'</div><div class="clist">'+list+'</div></div></div>';
+}
+
+/* ================= 购物车 ================= */
+function renderCart(c){
+  var ids = Object.keys(cart).filter(function(id){ return cart[id] > 0; });
+  if(!ids.length){
+    c.innerHTML = '<div class="cart-empty"><span class="e">🛒</span>购物车还是空的<div><span class="btn" onclick="go({name:\'tab\',tab:\'home\'})">去逛逛</span></div></div>';
+    return;
+  }
+  var rows = ids.map(function(id){ return '<div class="card cart-row"><div class="e">'+product(id).emoji+'</div>'+
+    '<div class="mid"><div class="n">'+product(id).name+'</div><div class="p">¥'+product(id).price.toFixed(2)+'</div></div>'+
+    '<div class="stepper"><button onclick="changeQty(\''+id+'\',-1)">−</button><span class="q">'+cart[id]+'</span><button class="add" onclick="changeQty(\''+id+'\',1)">+</button></div></div>'; }).join('');
+  var total = cartTotal();
+  var free = total >= 39;
+  c.innerHTML = '<div class="cart-list">'+rows+'</div>'+
+    '<div class="cart-foot"><div class="sum"><div class="t1">'+(free?'已免配送费':'满 39 元免配送费')+'</div><div class="t2">合计 ¥'+fmt(total)+'</div></div>'+
+    '<button class="pay" onclick="toCheckout()">去结算 ('+cartCount()+')</button></div>';
+}
+
+/* ================= 我的 ================= */
+function renderMine(c){
+  var unpaid = orders.filter(function(o){ return o.status==='待付款'; }).length;
+  var unsend = orders.filter(function(o){ return o.status==='待发货'; }).length;
+  var unreceive = orders.filter(function(o){ return o.status==='待收货'; }).length;
+  var done = orders.filter(function(o){ return o.status==='已完成'; }).length;
+  function cnt(n){ return n>0 ? '<span class="cnt">'+n+'</span>' : ''; }
+  var recent = orders.length ? orders.map(function(o){
+    return '<div class="o-card"><span class="e">'+o.emoji+'</span><div class="info"><div class="t">'+o.title+'</div><div class="d">'+o.time+' · 共 '+o.count+' 件</div></div><span class="st">'+o.status+'</span></div>';
+  }).join('') : '<div style="text-align:center;color:#bbb;padding:18px 0;font-size:13px">暂无订单，快去下单吧～</div>';
+  c.innerHTML =
+    '<div class="mine">'+
+    '<div class="profile"><div class="av">🧑‍🌾</div><div><div class="nm">微信用户</div><div class="sub">鑫源菜摊 · 当日新鲜蔬菜直达</div></div></div>'+
+    '<div class="card ord-card"><div class="oc-head"><span>我的订单</span><span class="all" onclick="push({name:\'page\',page:\'orders\'})">全部订单 ›</span></div>'+
+      '<div class="oc-row">'+
+        '<div class="oc-item"><span class="i">💰'+cnt(unpaid)+'</span><span class="n">待付款</span></div>'+
+        '<div class="oc-item"><span class="i">📦'+cnt(unsend)+'</span><span class="n">待发货</span></div>'+
+        '<div class="oc-item"><span class="i">🚚'+cnt(unreceive)+'</span><span class="n">待收货</span></div>'+
+        '<div class="oc-item"><span class="i">✅'+cnt(done)+'</span><span class="n">已完成</span></div>'+
+      '</div></div>'+
+    '<div class="card menu">'+
+      '<div class="mrow"><span class="i">📍</span><span class="n">收货地址</span><span class="ar">›</span></div>'+
+      '<div class="mrow"><span class="i">🎟️</span><span class="n">优惠券</span><span class="ar">›</span></div>'+
+      '<div class="mrow"><span class="i">💬</span><span class="n">联系客服</span><span class="ar">›</span></div>'+
+      '<div class="mrow"><span class="i">ℹ️</span><span class="n">关于我们</span><span class="ar">›</span></div>'+
+    '</div>'+
+    '<div class="card recent"><div class="rt">最近订单</div>'+recent+'</div>'+
+    '</div>';
+}
+
+/* ================= 搜索 ================= */
+function renderSearch(h,c){
+  h.innerHTML = '<div class="search-bar"><input id="sinput" placeholder="搜索蔬菜 / 水果 / 肉禽…" oninput="doSearch(this.value)"><span class="cancel" onclick="back()">取消</span></div>';
+  var hot = ['西红柿','土豆','鸡蛋','苹果','五花肉','基围虾','大米'];
+  c.innerHTML = '<div class="hot"><div class="ht">热门搜索</div><div class="hs">'+
+    hot.map(function(k){ return '<span onclick="doSearch(\''+k+'\')">'+k+'</span>'; }).join('')+'</div></div>';
+  document.getElementById('sinput').focus();
+}
+function doSearch(kw){
+  var k = (kw||'').trim();
+  var c = document.getElementById('content');
+  if(!k){ renderSearch(document.getElementById('header'), c); return; }
+  var res = PRODUCTS.filter(function(p){ return p.name.indexOf(k) > -1 || p.emoji === k; });
+  var html = res.length ? res.map(function(p){
+    return '<div class="sr" onclick="push({name:\'page\',page:\'product\',id:\''+p.id+'\'})"><div class="e">'+p.emoji+'</div><div class="mid"><div class="n">'+p.name+'</div><div class="m">⭐ '+p.rating+' · 已售 '+p.sales+'</div></div><span class="p">¥'+p.price.toFixed(2)+'</span><button class="add" onclick="event.stopPropagation();addToCart(\''+p.id+'\',1)">+</button></div>';
+  }).join('') : '<div class="cart-empty"><span class="e">🔍</span>没有找到「'+k+'」相关商品</div>';
+  c.innerHTML = '<div class="sresults">'+html+'</div>';
+}
+
+/* ================= 商品详情 ================= */
+function renderProduct(h,c){
+  var p = product(view.id);
+  var q = detailQty;
+  h.innerHTML = '<div class="h-title"><div class="back" onclick="back()">‹</div><div class="t">商品详情</div><div class="right" onclick="push({name:\'page\',page:\'cart\'})">🛒</div></div>';
+  c.innerHTML =
+    '<div class="detail"><div class="hero">'+p.emoji+'</div>'+
+    '<div class="body"><div class="nm">'+p.name+(p.tag?' <span class="tag '+tagClass(p.tag)+'">'+p.tag+'</span>':'')+'</div>'+
+    '<div class="meta">⭐ '+p.rating+' 好评 · 已售 '+p.sales+' · 产地直采 · 新鲜保证</div>'+
+    '<div class="price"><span class="cur">¥</span>'+p.price.toFixed(2)+'<span class="unit">'+p.unit+'</span></div>'+
+    '<div class="desc"><div class="dt">商品描述</div><p>精选优质食材，产地当日直采，冷链配送，坏果坏菜包赔。下单后最快 1 小时送达，让每一餐都新鲜安心。</p></div></div>'+
+    '<div class="buybar"><div class="stp"><button onclick="detailQty=Math.max(1,detailQty-1);render()">−</button><span class="q">'+detailQty+'</span><button class="add" onclick="detailQty++;render()">+</button></div>'+
+    '<div class="btns"><button class="cart-btn" onclick="addToCart(\''+p.id+'\',detailQty);toast(\'已加入购物车\')">加入购物车</button>'+
+    '<button class="buy-btn" onclick="buyNow(\''+p.id+'\')">立即购买</button></div></div></div>';
+}
+function buyNow(id){
+  addToCart(id, detailQty);
+  toCheckout();
+}
+
+/* ================= 购物车操作 ================= */
+function addToCart(id, n){
+  cart[id] = (cart[id]||0) + n;
+  saveCart();
+  renderBadge();
+  toast('已加入购物车 🛒');
+}
+function changeQty(id, d){
+  cart[id] = (cart[id]||0) + d;
+  if(cart[id] <= 0){ delete cart[id]; toast('已移出购物车'); }
+  saveCart();
+  render();
+}
+
+/* ================= 结算 ================= */
+function toCheckout(){
+  if(!cartCount()){ toast('购物车还是空的'); return; }
+  detailQty = 1;
+  push({name:'page', page:'checkout'});
+}
+function renderCheckout(h,c){
+  h.innerHTML = '<div class="h-title"><div class="back" onclick="back()">‹</div><div class="t">确认订单</div></div>';
+  var a = ADDRESSES[selectedAddr];
+  var total = cartTotal();
+  var fee = total >= 39 ? 0 : 5;
+  var ids = Object.keys(cart).filter(function(id){ return cart[id] > 0; });
+  var goods = ids.map(function(id){
+    var p = product(id);
+    return '<div class="ck-row ck-g"><span style="font-size:20px">'+p.emoji+'</span><span style="margin-left:8px;flex:1">'+p.name+' ×'+cart[id]+'</span><span class="vl">¥'+fmt(p.price*cart[id])+'</span></div>';
+  }).join('');
+  c.innerHTML =
+    '<div class="ck">'+
+    '<div class="ck-addr" onclick="push({name:\'page\',page:\'addr\'})"><span class="tag">'+a.tag+'</span><div><div class="who">'+a.name+'<span class="phone">'+a.phone+'</span></div><div class="ad">'+a.addr+'</div></div><span class="ar">›</span></div>'+
+    '<div class="ck-box">'+
+      '<div class="ck-row"><span class="lb">配送时间</span><span class="vl sel">'+TIME_SLOTS[selectedSlot]+'</span></div>'+
+      '<div class="ck-row"><span class="lb">配送方式</span><span class="vl">极速达 · 最快1小时</span></div>'+
+      '<div class="ck-row"><span class="lb">支付方式</span><span class="vl">微信支付 ✓</span></div>'+
+    '</div>'+
+    '<div class="ck-goods">'+goods+'</div>'+
+    '<div class="ck-sum">'+
+      '<div class="line"><span>商品金额</span><span>¥'+fmt(total)+'</span></div>'+
+      '<div class="line"><span>配送费</span><span>'+(fee===0?'免运费':'¥'+fmt(fee))+'</span></div>'+
+      '<div class="line big"><span>实付金额</span><span class="v">¥'+fmt(total+fee)+'</span></div>'+
+      '<div class="submit" onclick="placeOrder()">提交订单</div>'+
+    '</div></div>';
+}
+function renderAddr(h,c){
+  h.innerHTML = '<div class="h-title"><div class="back" onclick="back()">‹</div><div class="t">选择收货地址</div></div>';
+  c.innerHTML = '<div class="addr-pick">'+ADDRESSES.map(function(a,i){
+    return '<div class="ap'+(i===selectedAddr?' sel':'')+'" onclick="selectedAddr='+i+';back()"><div class="dot"></div><div><div style="font-weight:700">'+a.name+'<span style="color:#999;font-weight:400;margin-left:8px">'+a.phone+'</span></div><div style="font-size:12px;color:#555;margin-top:4px">'+a.addr+'</div></div></div>';
+  }).join('')+'</div>';
+}
+
+/* ================= 下单 ================= */
+function placeOrder(){
+  var total = cartTotal();
+  var fee = total >= 39 ? 0 : 5;
+  var pay = Math.round((total+fee)*100)/100;
+  var ids = Object.keys(cart).filter(function(id){ return cart[id] > 0; });
+  var first = product(ids[0]);
+  var count = cartCount();
+  var now = new Date();
+  function pad(x){ return x<10?'0'+x:''+x; }
+  var t = pad(now.getHours())+':'+pad(now.getMinutes());
+  var ono = 'XD' + now.getFullYear() + pad(now.getMonth()+1) + pad(now.getDate()) + pad(now.getHours()) + pad(now.getMinutes()) + pad(now.getSeconds());
+  orders.unshift({
+    no: ono, title: ids.length>1 ? first.name+' 等 '+ids.length+' 种商品' : first.name,
+    emoji: first.emoji, count: count, total: pay, time: t, status:'待收货', addr: ADDRESSES[selectedAddr]
+  });
+  cart = {};
+  saveCart();
+  go({name:'page', page:'success', no:ono, total:pay, count:count, time:TIME_SLOTS[selectedSlot]});
+}
+function renderSuccess(h,c){
+  h.innerHTML = '<div class="h-title"><div class="back" style="visibility:hidden">‹</div><div class="t">下单成功</div></div>';
+  c.innerHTML =
+    '<div class="ok"><div class="ring"><span>✓</span></div>'+
+    '<div class="t1">订单提交成功</div>'+
+    '<div class="t2">配送员正在加紧备货<br>预计送达：'+view.time+'</div>'+
+    '<div class="card2">'+
+      '<div class="r"><span class="k">订单编号</span><span>'+view.no+'</span></div>'+
+      '<div class="r"><span class="k">商品件数</span><span>'+view.count+' 件</span></div>'+
+      '<div class="r"><span class="k">实付金额</span><span style="color:#fa5151;font-weight:700">¥'+fmt(view.total)+'</span></div>'+
+      '<div class="r"><span class="k">收货地址</span><span style="max-width:200px;text-align:right">'+ADDRESSES[selectedAddr].addr+'</span></div>'+
+    '</div>'+
+    '<button class="btn-ok" onclick="go({name:\'tab\',tab:\'home\'})">返回首页</button>'+
+    '<button class="btn-ok gray" onclick="push({name:\'page\',page:\'orders\'})">查看订单</button></div>';
+}
+
+/* ================= 全部订单 ================= */
+function renderOrdersPage(){
+  var h = document.getElementById('header');
+  var c = document.getElementById('content');
+  h.innerHTML = '<div class="h-title"><div class="back" onclick="back()">‹</div><div class="t">全部订单</div></div>';
+  var body = orders.length ? orders.map(function(o){
+    return '<div class="card" style="margin:10px 12px;padding:12px"><div style="display:flex;justify-content:space-between;font-size:12px;color:#999;border-bottom:1px solid var(--line);padding-bottom:8px"><span>'+o.no+'</span><span style="color:#07c160">'+o.status+'</span></div>'+
+      '<div style="display:flex;align-items:center;gap:10px;padding-top:10px"><span style="font-size:32px">'+o.emoji+'</span><div style="flex:1"><div style="font-weight:600">'+o.title+'</div><div style="font-size:12px;color:#999;margin-top:2px">共 '+o.count+' 件 · '+o.time+'</div></div><div style="color:#fa5151;font-weight:700">¥'+fmt(o.total)+'</div></div></div>';
+  }).join('') : '<div class="cart-empty"><span class="e">📋</span>暂无订单</div>';
+  c.innerHTML = body;
+}
+function renderOrders(h,c){ renderOrdersPage(); }
+
+/* ================= 全局视图分发 ================= */
+(function(){
+  var origRender = render;
+  render = function(){
+    if(view.name==='page' && view.page==='orders'){ renderOrdersPage(); renderBadge(); return; }
+    origRender();
+  };
+})();
+
+/* ================= 提示 ================= */
+var toastTimer = null;
+function toast(msg){
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  if(toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ el.classList.remove('show'); }, 1600);
+}
+
+/* ================= 启动 ================= */
+render();
+</script>
+</body>
+</html>
